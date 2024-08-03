@@ -14,46 +14,57 @@ CORS(app)  # Enable CORS for all routes
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+	return render_template('index.html')
 
 @app.route("/topic")
 def result():
     keyword = request.args.get('keyword')
     period = request.args.get('period').split(' - ')
-    start_date = datetime.strptime(period[0], "%m/%d/%Y").strftime("%Y-%m-%d")
-    end_date = datetime.strptime(period[1], "%m/%d/%Y").strftime("%Y-%m-%d")
+    start_date = datetime.strptime(period[0], "%m/%d/%Y")
+    start_date = start_date.strftime("%Y-%m-%d")
+    end_date = datetime.strptime(period[1], "%m/%d/%Y")
+    end_date = end_date.strftime("%Y-%m-%d")
     num_tweets = int(request.args.get('num_tweets'))
     with_context = bool(request.args.get('with_context'))
     with_document = bool(request.args.get('with_document'))
-
     tweets = Tweet.getTweetByKeyword(keyword, start_date, end_date, num_tweets)
-    dataTweetText = [tweet['full_text'] for tweet in tweets]
-    dataTweet = [{**tweet, 'projectId': tweet.get('projectId')} for tweet in tweets]
 
-    data = Preprocessing(dataTweetText).get_data()
+    dataTweetText = []
+    dataTweet = []
+    for tweet in tweets:
+        del tweet['_id']
+        dataTweet.append(tweet)
+        dataTweetText.append(tweet['full_text'])
+
+    data = Preprocessing(dataTweetText)
+    data = data.get_data()
     lda = Lda()
     lda_model = lda.generateTopic(data)
     num_topics = lda_model.num_topics
     topics = lda_model.show_topics(log=False, formatted=False)
 
-    topic_res = [[word for word, _ in topic] for topic_id, topic in topics]
+    topic_res = []
+    for topic_id, topic in topics:
+        topic_res.append([word for word, _ in topic])
 
-    res = {
-        "status": 200,
-        "message": "Data Topics",
+    res = { 
+        "status" : 200, 
+        "message" : "Data Topics",
         "data": {
             "topic": topic_res
-        }
-    }
+        }, 
+    } 
 
-    if with_context:
-        context = Llm.getContext(topics, keyword, num_topics, dataTweetText)
-        res['data']['context'] = context
+    # if with_context:
+    context = Llm.getContext(topics, keyword, num_topics, dataTweetText)
+    res['data']['context'] = context
 
-    if with_document:
-        documents_prob = lda.document(dataTweet, data, lda_model, num_topics)
-        res['data']['documents_topic'] = documents_prob
+    print(num_topics)
+    # if with_document:
+    documents_prob = lda.document(dataTweet, data, lda_model, num_topics)
+    res['data']['documents_topic'] = documents_prob
 
+    # return render_template('result.html', context=context, topic=topic)
     return jsonify(res)
 
 @app.route("/documents")
