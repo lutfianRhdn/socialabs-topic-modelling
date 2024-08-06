@@ -42,7 +42,7 @@ def result():
 		dataTweet.append(tweet)
 		dataTweetText.append(tweet['full_text'])
 
-	data = Prepocessing(dataTweetText)
+	data = Preprocessing(dataTweetText)
 	data = data.get_data()
 	lda = Lda()
 	lda_model = lda.generateTopic(data)

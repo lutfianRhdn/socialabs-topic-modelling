@@ -78,16 +78,13 @@ class Llm:
         topic_keywords = words
         # Create a prompt using the keywords
         role = "AI Linguistik"
-        action = "menentukan kalimat dari beberapa topik berdasarkan dari kumpulan kata-kata hasil dari proses LDA"
-        step = ("dengan menganalisis bobot setiap topik yang ada pada penomoran angka dalam merangkai kata-kata kunci "
-                "menjadi kalimat yang padu untuk sebuah topik yang diperbincangkan di Twitter dengan menggunakan penomoran "
-                "untuk setiap topik dengan mengambil kata inti dari hasil LDA lalu menyusunnya menjadi sebuah kalimat yang "
-                "padu yang mudah dipahami")
-        context = f"membahas tentang keyword: {keyword} dengan berbagai pandangan masyarakat terhadap topik tersebut dengan kata-kata kunci berikut:\n{', '.join(topic_keywords)}"
+        action = "dapat menentukan kalimat dari beberapa topik hasil dari proses topic modeling yang berupa kumpulan kata-kata, "
+        step = "dengan mempertimbangkan bobot setiap topik yang ada, dalam merangkai kata-kata kunci menjadi kalimat yang padu untuk sebuah topik yang diperbincangkan di Twitter dengan mengambil kata dari hasil topic modeling lalu menyusunnya menjadi sebuah kalimat yang padu yang mudah dipahami. "
+        context = f"Topik ini membahas tentang keyword: {keyword} dengan berbagai pandangan masyarakat terhadap topik tersebut dengan hasil topic modeling dengan 1 topik terdiri dari beberapa kata kunci berikut: {topic_keywords}. "
         format_str = "dengan format kalimat singkat yang mudah dipahami oleh masyarakat"
 
         # Combine components into the RASCEF prompt
-        prompt = f"# RASCEF = Role + ( Action + Step + Context + Example ) + Format\n\nAnda adalah {role} yang {action} {step} {context}. Buatkan {format_str}"
+        prompt = f"Anda adalah {role} yang {action} {step} {context}. Buatkan {format_str}"
 
         # Generate a completion using the ChatCompletion endpoint
         openai.api_key = openai_key

@@ -28,9 +28,8 @@ def topicModelling(dataGatheringQueue):
         data = Preprocessing(dataForLda).get_data()
         lda = Lda()
         lda_model = lda.generateTopic(data)
-        num_topics = lda_model.num_topics
         topics = lda_model.show_topics(log=False, formatted=False)
-        documents_prob = lda.document(dataTweet, data, lda_model, num_topics)
+        documents_prob = lda.document(dataTweet, data, lda_model)
 
         topic_res = []
         for topic_id, topic in topics:
