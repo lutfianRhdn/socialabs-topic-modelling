@@ -38,7 +38,6 @@ def result():
 	dataTweetText = []
 	dataTweet = []
 	for tweet in tweets:
-		del tweet['_id']
 		dataTweet.append(tweet)
 		dataTweetText.append(tweet['full_text'])
 
@@ -56,7 +55,6 @@ def result():
 	context = Llm.getContext(topic_res, keyword, num_topics)
 	documents_prob = lda.document(dataTweet, data, lda_model)
 	
-	print(context)
 	res = { 
 		"status" : 200, 
 		"message" : "Data Topics",
