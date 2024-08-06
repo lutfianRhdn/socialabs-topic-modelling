@@ -52,6 +52,7 @@ def topicModelling(dataGatheringQueue):
             "tweetId": tweetId,
         }
         publish_message(topicModellingProduce)
+        
     except Exception as e:
         print(f"Error processing topic modeling: {e}")
 

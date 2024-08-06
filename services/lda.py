@@ -48,7 +48,7 @@ class Lda:
             vec2[dictionary.token2id[word]] = weight
         return 1 - jensenshannon(vec1, vec2)
     
-    def document(self, data_tweet, data, lda_model, num_topics):
+    def document(self, data_tweet, data, lda_model):
         dictionary = corpora.Dictionary(data)
         documents_probability = []
         for i, doc in enumerate(data):
@@ -60,7 +60,7 @@ class Lda:
                 "probability": str(top_topic[1])
             })
             documents_probability.append(data_tweet[i])
-                        
+        
         return documents_probability
 
     def agregrat(self, all_topics, dictionary):
