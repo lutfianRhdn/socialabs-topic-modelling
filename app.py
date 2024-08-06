@@ -25,8 +25,6 @@ def result():
     end_date = datetime.strptime(period[1], "%m/%d/%Y")
     end_date = end_date.strftime("%Y-%m-%d")
     num_tweets = int(request.args.get('num_tweets'))
-    with_context = bool(request.args.get('with_context'))
-    with_document = bool(request.args.get('with_document'))
     tweets = Tweet.getTweetByKeyword(keyword, start_date, end_date, num_tweets)
 
     dataTweetText = []
@@ -93,6 +91,16 @@ def get_topic_by_project(projectId):
         "status": 200,
         "message": "Data Topics",
         "data": topic
+    }
+    return jsonify(data)
+
+@app.route("/document-by-project/<string:projectId>", methods=['GET'])
+def get_document_by_project(projectId):
+    document_topic = Topics.getDocumentTopicByProjectId(projectId)
+    data = {
+        "status": 200,
+        "message": "Data Documents",
+        "data": document_topic
     }
     return jsonify(data)
 

@@ -1,9 +1,12 @@
 from multiprocessing import Process
 from consumer import start_consumer
+from app import start_app
 import os
 import subprocess
 
 def start_app():
+
+    # if os windows not run with gunicorn
     subprocess.run(["gunicorn", "--config", "gunicorn_config.py", "app:app"])
 
 def main():
