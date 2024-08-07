@@ -26,8 +26,7 @@ def result():
 	# end_date = end_date.strftime("%Y-%m-%d")
 	start_date = request.args.get('start_date')
 	end_date = request.args.get('end_date')
-	num_tweets = int(request.args.get('num_tweets'))
-	tweets = Tweet.getTweetByKeyword(keyword, start_date, end_date, num_tweets)
+	tweets = Tweet.getTweetByKeyword(keyword, start_date, end_date)
 	
 	if len(tweets) <= 0:
 		return jsonify({ 
@@ -95,4 +94,7 @@ def start_app():
     load_dotenv()
     app_port = int(os.getenv('APP_PORT', 6000))
     app_debug = os.getenv('APP_DEBUG', 'True') == 'True'
-    app.run(debug=app_debug, port=app_port, use_reloader=False)
+    app.run(debug=app_debug, port=app_port)
+
+if __name__ == "__main__":
+		start_app()

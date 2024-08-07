@@ -15,7 +15,7 @@ class Tweet:
             {"$set": {"topic": data}}
         )
 
-    def getTweetByKeyword(keyword, start_date, end_date, limit):
+    def getTweetByKeyword(keyword, start_date, end_date):
         # Match stage to filter tweets by keyword
         match_stage = {
             '$match': {
@@ -56,9 +56,6 @@ class Tweet:
         }
         pipeline.append(project_stage)
         
-        # Limit stage to limit the number of results
-        pipeline.append({'$limit': limit})
-
         # Execute the aggregation pipeline
         cursor = db2.tweets.aggregate(pipeline)
         return list(cursor)
