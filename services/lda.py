@@ -6,9 +6,9 @@ from scipy.spatial.distance import jensenshannon
 from joblib import Parallel, delayed
 
 class Lda:
-
-    def create_model(self, corpus, dictionary, num_topics):
-        return gensim.models.LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=10, alpha='symmetric')
+    
+    def create_model(self, corpus, dictionary, num_topics, alpha='symmetric', passes=10):
+        return gensim.models.ldamodel.LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=passes, alpha=alpha)
 
     def generateTopic(self, data):
         np.random.seed(1)
@@ -30,24 +30,6 @@ class Lda:
 
         lda_model = self.create_model(corpus, dictionary, num_topics)
         return lda_model
-
-    def agregrat(self, all_topics, dictionary):
-        aggregated_topics = []
-        threshold = 0.5
-
-        for topics in all_topics:
-            for topic_id, topic_words in topics:
-                merged = False
-                for agg_id, agg_topic in enumerate(aggregated_topics):
-                    cosine_sim = self.cosine_similarity_topic(topic_words, agg_topic, dictionary)
-                    if cosine_sim > threshold:
-                        aggregated_topics[agg_id] = {word: (agg_topic.get(word, 0) + weight) / 2 for word, weight in topic_words.items()}
-                        merged = True
-                        break
-                if not merged:
-                    aggregated_topics.append(topic_words)
-                    
-        return aggregated_topics
 
     # Fungsi untuk menghitung kesamaan antar topik menggunakan cosine similarity
     def cosine_similarity_topic(self, topic1, topic2, dictionary):
