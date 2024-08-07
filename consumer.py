@@ -43,7 +43,10 @@ def topicModelling(dataGatheringQueue):
             }
             topic_res.append(topic_dict)
 
-        Topics.createTopic(topic_res)
+        Topics.createTopic({
+            "keyword": keyword,
+            **topic_res
+        })
         Topics.createDocument(documents_prob)
 
         topicModellingProduce = {

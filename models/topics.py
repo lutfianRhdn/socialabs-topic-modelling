@@ -16,6 +16,13 @@ class Topics:
             {"_id": 0}
         )
         return list(topicProject)
+    
+    def getContextTopicByProjectId(projectId):
+        contextTopic =  db1.topics.find(
+            {"projectId": projectId},
+            {"_id": 0, "context": 1, "topicId": 1, "keyword": 1}
+        )
+        return list(contextTopic)
 
     def getDocumentTopicByProjectId(projectId):
         documentTopic =  db1.documents.find(

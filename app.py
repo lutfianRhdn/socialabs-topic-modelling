@@ -8,6 +8,7 @@ from services.lda import Lda
 from services.llm import Llm
 from models.tweet import Tweet
 from models.topics import Topics
+import requests
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -88,6 +89,26 @@ def get_document_by_project(projectId):
     }
     return jsonify(data)
 
+@app.route("/rag-topic/<string:projectId>", methods=['GET'])
+def rag_topic(projectId):
+  
+		topic = Topics.getContextTopicByProjectId(projectId)
+    
+		document = Topics.getDocumentTopicByProjectId(projectId)
+    		
+		# Menyiapkan data untuk dikembalikan
+		data = {
+        "status": 200,
+        "message": "Data Topics",
+        "data": {
+            "keyword": topic[0]['keyword'],
+            "topic": topic,
+            "documents_topic": document,
+        }
+    }
+
+		return jsonify(data)
+
 def start_app():
     from dotenv import load_dotenv
     import os
@@ -96,5 +117,6 @@ def start_app():
     app_debug = os.getenv('APP_DEBUG', 'True') == 'True'
     app.run(debug=app_debug, port=app_port)
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
 		start_app()
