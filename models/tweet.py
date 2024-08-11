@@ -4,10 +4,12 @@ from datetime import datetime
 
 class Tweet:
     def getTweetByIdStr(id_str_list):
-        return db2.tweets.find(
-            {"id_str": {"$in": id_str_list}},
+        tweet = db2.tweets.find(
+            {"id_str": {"$in": id_str_list, "$ne": None}},
             {"_id":0, "full_text": 1, "id_str": 1, "user_id_str": 1, "username" : 1, "conversation_id_str": 1, "tweet_url" : 1, "in_reply_to_screen_name" :1}
         )
+        return tweet
+
     
     def classifyTweet(id_str, data):
         return db2.tweets.update_many(

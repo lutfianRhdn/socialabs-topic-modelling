@@ -116,7 +116,3 @@ def start_app():
     app_port = int(os.getenv('APP_PORT', 6000))
     app_debug = os.getenv('APP_DEBUG', 'True') == 'True'
     app.run(debug=app_debug, port=app_port)
-
-
-if __name__ == '__main__':
-		start_app()

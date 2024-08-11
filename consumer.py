@@ -1,10 +1,48 @@
 import pika
 import json
+import logging
 from services.preprocessing import Preprocessing
 from services.lda import Lda
 from services.llm import Llm
 from models.tweet import Tweet
 from models.topics import Topics
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def consumer():
+    connection_params = pika.URLParameters("amqps://socialabs:Code@labs011013@b-c64d820c-55be-4d28-a9ca-e3a45d7a1873.mq.ap-southeast-1.amazonaws.com:5671")
+    
+    try:
+        with pika.BlockingConnection(connection_params) as connection:
+            channel = connection.channel()
+
+            # Ensure the queue exists
+            channel.queue_declare(queue="dataGatheringQueue", durable=True)
+
+            def callback(ch, method, properties, body):
+                try:
+                    tweet = json.loads(body.decode('utf-8'))
+                    print(tweet)
+                    topicModelling(tweet)
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
+                except json.JSONDecodeError as e:
+                    logging.error(f"JSON decoding error: {e}")
+                    ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+                except Exception as e:
+                    logging.error(f"Error consuming message: {e}")
+                    ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+
+            channel.basic_qos(prefetch_count=1)
+            channel.basic_consume(queue="dataGatheringQueue", on_message_callback=callback, auto_ack=False)
+
+            logging.info("Waiting for messages. To exit press CTRL+C")
+            channel.start_consuming()
+
+    except KeyboardInterrupt:
+        logging.info("Consumer interrupted. Closing connection.")
+    except Exception as e:
+        logging.error(f"Error in consumer: {e}")
 
 def topicModelling(dataGatheringQueue):
     try:
@@ -43,51 +81,24 @@ def topicModelling(dataGatheringQueue):
             }
             topic_res.append(topic_dict)
 
-        Topics.createTopic({
-            "keyword": keyword,
-            **topic_res
-        })
-        Topics.createDocument(documents_prob)
+
+        documents_prob_id = [ doc['id_str'] for doc in documents_prob]
+        project_documents = [ {**doc, "projectId": projectId} for doc in documents_prob]
+
+        Topics.createTopic(topic_res)
+        Topics.createDocument(project_documents)
 
         topicModellingProduce = {
             "projectId": projectId,
-            "tweetId": tweetId,
+            "tweetId": documents_prob_id,
         }
+
         publish_message(topicModellingProduce)
+        produceProjectStatusQueue(projectId)
         
     except Exception as e:
         print(f"Error processing topic modeling: {e}")
 
-def consumer():
-    connection = pika.BlockingConnection(
-        pika.URLParameters("amqps://socialabs:Code@labs011013@b-c64d820c-55be-4d28-a9ca-e3a45d7a1873.mq.ap-southeast-1.amazonaws.com:5671")
-    )
-    channel = connection.channel()
-
-    channel.queue_declare(queue="dataGatheringQueue", durable=True)
-
-    def callback(ch, method, properties, body):
-        try:
-            tweet = json.loads(body.decode('utf-8'))
-            topicModelling(tweet)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-        except Exception as e:
-            print(f"Error consuming message: {e}")
-
-    channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(
-        queue="dataGatheringQueue",
-        on_message_callback=callback,
-        auto_ack=False,
-    )
-
-    print("Waiting for messages. To exit press CTRL+C")
-    try:
-        channel.start_consuming()
-    except KeyboardInterrupt:
-        print("Consumer interrupted. Closing connection.")
-    finally:
-        connection.close()
 
 def publish_message(tweet):
     connection = pika.BlockingConnection(
@@ -104,6 +115,34 @@ def publish_message(tweet):
         properties=pika.BasicProperties(delivery_mode=2)
     )
 
+    connection.close()
+
+def produceProjectStatusQueue(projectId):
+    connection = pika.BlockingConnection(
+            pika.URLParameters("amqps://socialabs:Code@labs011013@b-c64d820c-55be-4d28-a9ca-e3a45d7a1873.mq.ap-southeast-1.amazonaws.com:5671")
+        )
+    channel = connection.channel()
+
+    header = {
+        "projectId": projectId,
+    }
+    
+    payload = {
+        "topic_modelling": True
+    }
+    print("Project Status Queue Sent with header: ", header, "\n and payload: ", payload)
+    
+    channel.queue_declare(queue="projectStatusQueue", durable=True)
+    channel.basic_publish(
+        exchange="",
+        routing_key="projectStatusQueue",
+        body=json.dumps(payload),
+        properties=pika.BasicProperties(
+            headers=header,
+            delivery_mode=2,
+        ),
+    )
+    print("Project Status Queue Sent to Project ID: ", projectId)
     connection.close()
 
 def start_consumer():
