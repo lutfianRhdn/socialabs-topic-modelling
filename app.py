@@ -81,13 +81,14 @@ def get_topic_by_project(projectId):
 
 @app.route("/document-by-project/<string:projectId>", methods=['GET'])
 def get_document_by_project(projectId):
-    document_topic = Topics.getDocumentTopicByProjectId(projectId)
-    data = {
+	topic = request.args.get('topic')
+	document_topic = Topics.getDocumentTopicByProjectId(projectId, topic)
+	data = {
         "status": 200,
         "message": "Data Documents",
         "data": document_topic
     }
-    return jsonify(data)
+	return jsonify(data)
 
 @app.route("/rag-topic/<string:projectId>", methods=['GET'])
 def rag_topic(projectId):

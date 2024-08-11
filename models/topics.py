@@ -24,10 +24,13 @@ class Topics:
         )
         return list(contextTopic)
 
-    def getDocumentTopicByProjectId(projectId):
+    def getDocumentTopicByProjectId(projectId, topic=None):
+        filter = {"projectId": projectId}
+        if topic != None:
+            filter["topic"] = topic
+        
         documentTopic =  db1.documents.find(
-            {"projectId": projectId},
-            # just want get full_text, username, tweet_url
-            {"_id": 0, "full_text": 1, "username": 1, "tweet_url": 1}
+            filter,
+            {"_id": 0, "full_text": 1, "username": 1, "tweet_url": 1, "topic": 1}
         )
         return list(documentTopic)
