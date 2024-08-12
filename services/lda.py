@@ -3,14 +3,20 @@ import numpy as np
 from gensim import corpora
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.spatial.distance import jensenshannon
+from joblib import Parallel, delayed
 
 class Lda:
+    
+    def create_model(self, corpus, dictionary, num_topics, alpha='symmetric', passes=10):
+        return gensim.models.ldamodel.LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=passes, alpha=alpha)
+
     def generateTopic(self, data):
         np.random.seed(1)
         dictionary = corpora.Dictionary(data)
         corpus = [dictionary.doc2bow(doc) for doc in data]
         num_topics_range = range(2, 10)
-        lda_models = [self.create_lda_model(corpus, dictionary, num_topics) for num_topics in num_topics_range]
+        
+        lda_models = Parallel(n_jobs=-1)(delayed(self.create_model)(corpus, dictionary, num_topics) for num_topics in num_topics_range)
         
         # Ambil topik-topik dari model-model tersebut
         all_topics = []
@@ -18,15 +24,12 @@ class Lda:
             topics = model.show_topics(formatted=False, num_words=10)
             all_topics.append([(topic_id, dict(words)) for topic_id, words in topics])
         
+        # Lanjutkan dengan agregasi topik dan pemodelan akhir seperti sebelumnya
         agregated_topic = self.agregrat(all_topics, dictionary)
         num_topics = len(agregated_topic)
 
-        lda_model = self.create_lda_model(corpus, dictionary, num_topics)
+        lda_model = self.create_model(corpus, dictionary, num_topics)
         return lda_model
-
-    # Fungsi untuk membuat model topik
-    def create_lda_model(self, corpus, dictionary, num_topics, alpha='symmetric', passes=10):
-        return gensim.models.ldamodel.LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=passes, alpha=alpha)
 
     # Fungsi untuk menghitung kesamaan antar topik menggunakan cosine similarity
     def cosine_similarity_topic(self, topic1, topic2, dictionary):
@@ -48,7 +51,7 @@ class Lda:
             vec2[dictionary.token2id[word]] = weight
         return 1 - jensenshannon(vec1, vec2)
     
-    def document(self, data_tweet, data, lda_model, num_topics):
+    def document(self, data_tweet, data, lda_model):
         dictionary = corpora.Dictionary(data)
         documents_probability = []
         for i, doc in enumerate(data):
@@ -60,7 +63,7 @@ class Lda:
                 "probability": str(top_topic[1])
             })
             documents_probability.append(data_tweet[i])
-                        
+        
         return documents_probability
 
     def agregrat(self, all_topics, dictionary):
