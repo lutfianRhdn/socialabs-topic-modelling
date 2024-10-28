@@ -1,0 +1,29 @@
+name: Build and Deploy to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v1
+
+    - name: Azure Container Registry Login
+      uses: Azure/docker-login@v1.0.1
+      with:
+        username: ${{ secrets.AZURE_ECR_USERNAME }}
+        password: ${{ secrets.AZURE_ECR_PASSWORD }}
+        login-server: ${{ secrets.AZURE_ECR_HUB }}
+    - name: Build and push Docker image
+      run: |
+        echo "Building Image with Tag {{github.sha}}, lastest"
+        docker build -t ${{secrets.AZURE_ECR_HUB}}/topic-modeling:${{ github.sha }} -t ${{secrets.AZURE_ECR_HUB}}/topic-modeling:lastest .
+        echo "Push Image to Azure Container Registry ......."
+        docker push ${{secrets.AZURE_ECR_HUB}}/topic-modeling --all-tags
