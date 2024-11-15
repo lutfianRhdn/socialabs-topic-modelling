@@ -1,6 +1,7 @@
 import pika
 import json
 import logging
+import os
 from services.preprocessing import Preprocessing
 from services.lda import Lda
 from services.llm import Llm
@@ -11,7 +12,7 @@ from models.topics import Topics
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def consumer():
-    connection_params = pika.URLParameters("amqps://socialabs:Code@labs011013@b-c64d820c-55be-4d28-a9ca-e3a45d7a1873.mq.ap-southeast-1.amazonaws.com:5671")
+    connection_params = pika.URLParameters(os.getenv("RABBITMQ_URL"))
     
     try:
         with pika.BlockingConnection(connection_params) as connection:
@@ -102,7 +103,7 @@ def topicModelling(dataGatheringQueue):
 
 def publish_message(tweet):
     connection = pika.BlockingConnection(
-        pika.URLParameters("amqps://socialabs:Code@labs011013@b-c64d820c-55be-4d28-a9ca-e3a45d7a1873.mq.ap-southeast-1.amazonaws.com:5671")
+        pika.URLParameters(os.getenv("RABBITMQ_URL"))
     )
     channel = connection.channel()
 
@@ -119,7 +120,7 @@ def publish_message(tweet):
 
 def produceProjectStatusQueue(projectId):
     connection = pika.BlockingConnection(
-            pika.URLParameters("amqps://socialabs:Code@labs011013@b-c64d820c-55be-4d28-a9ca-e3a45d7a1873.mq.ap-southeast-1.amazonaws.com:5671")
+            pika.URLParameters(os.getenv("RABBITMQ_URL"))
         )
     channel = connection.channel()
 
