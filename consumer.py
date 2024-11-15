@@ -120,7 +120,7 @@ def publish_message(tweet):
 
 def produceProjectStatusQueue(projectId):
     connection = pika.BlockingConnection(
-            pika.URLParameters(os.get("RABBITMQ_URL"))
+            pika.URLParameters(os.getenv("RABBITMQ_URL"))
         )
     channel = connection.channel()
 
