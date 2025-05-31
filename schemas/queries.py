@@ -1,5 +1,5 @@
 import strawberry
-from schemas.types import TopicByProjectResponse, TopicDocByProjectResponse
+from schemas.types import TopicByProjectResponse, TopicDocByProjectResponse, TopicProject, TopicDocument
 from models.topics import Topics
 
 @strawberry.type
@@ -8,11 +8,13 @@ class Query:
     @strawberry.field
     def get_topic_by_project(self, projectId: str) -> TopicByProjectResponse:
         try:
-            topic = Topics.getTopicByProjectId(projectId)
+            topics_data = Topics.getTopicByProjectId(projectId)
+
+            topics = [TopicProject(**item) for item in topics_data]
             return TopicByProjectResponse(
                 status=200,
                 message="Data Topics",
-                data=topic
+                data=topics
             )
         except Exception as e:
             raise Exception(str(e))
@@ -20,11 +22,13 @@ class Query:
     @strawberry.field
     def get_document_topic_by_project(self, projectId: str, topic: str) -> TopicDocByProjectResponse:
         try:
-            document_topic = Topics.getDocumentTopicByProjectId(projectId, topic)
+            document_topic_data = Topics.getDocumentTopicByProjectId(projectId, topic)
+
+            documents = [TopicDocument(**item) for item in document_topic_data]
             return TopicDocByProjectResponse(
                 status=200,
                 message="Data Documents",
-                data=document_topic
+                data=documents
             )
         except Exception as e:
             raise Exception(str(e))
