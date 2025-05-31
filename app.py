@@ -9,6 +9,9 @@ from services.llm import Llm
 from models.tweet import Tweet
 from models.topics import Topics
 import requests
+import strawberry
+from strawberry.flask.views import GraphQLView
+from schemas.schema import schema
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -109,6 +112,11 @@ def rag_topic(projectId):
     }
 
 		return jsonify(data)
+
+app.add_url_rule(
+    "/graphql",
+    view_func=GraphQLView.as_view("graphql", schema=schema)
+)
 
 def start_app():
     from dotenv import load_dotenv

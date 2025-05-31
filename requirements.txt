@@ -40,3 +40,5 @@ wrapt==1.16.0
 yarl==1.9.4
 flask-cors==4.0.1
 gunicorn
+strawberry-graphql
+strawberry-graphql[flask]
