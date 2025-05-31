@@ -85,6 +85,7 @@ def get_topic_by_project(projectId):
 @app.route("/document-by-project/<string:projectId>", methods=['GET'])
 def get_document_by_project(projectId):
 	topic = request.args.get('topic')
+	print(topic)
 	document_topic = Topics.getDocumentTopicByProjectId(projectId, topic)
 	data = {
         "status": 200,
