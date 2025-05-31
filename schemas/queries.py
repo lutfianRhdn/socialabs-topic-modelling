@@ -1,4 +1,5 @@
 import strawberry
+from typing import Optional
 from schemas.types import TopicByProjectResponse, TopicDocByProjectResponse, TopicProject, TopicDocument
 from models.topics import Topics
 
@@ -20,7 +21,7 @@ class Query:
             raise Exception(str(e))
 
     @strawberry.field
-    def get_document_topic_by_project(self, projectId: str, topic: str) -> TopicDocByProjectResponse:
+    def get_document_topic_by_project(self, projectId: str, topic: Optional[str] = None) -> TopicDocByProjectResponse:
         try:
             document_topic_data = Topics.getDocumentTopicByProjectId(projectId, topic)
 
