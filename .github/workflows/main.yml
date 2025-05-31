@@ -26,4 +26,4 @@ jobs:
         echo "Building Image with Tag {{github.sha}}, lastest"
         docker build -t ${{secrets.AZURE_ECR_HUB}}/topic-modelling:${{ github.sha }} -t ${{secrets.AZURE_ECR_HUB}}/topic-modelling:latest .
         echo "Push Image to Azure Container Registry ......."
-        docker push ${{secrets.AZURE_ECR_HUB}}/topic-modeling --all-tags
+        docker push ${{secrets.AZURE_ECR_HUB}}/topic-modelling --all-tags
