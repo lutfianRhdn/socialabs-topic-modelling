@@ -5,6 +5,14 @@ FROM python:3.10-slim
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
+
+
+# Install system dependencies including procps for pgrep command
+RUN apt-get update && apt-get install -y \
+    procps \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 # Set the working directory in the container
 WORKDIR /app
 
