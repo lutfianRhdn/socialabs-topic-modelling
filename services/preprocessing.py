@@ -3,6 +3,7 @@ import pandas as pd
 import nltk
 import string
 from nltk.corpus import stopwords
+import os 
 nltk.download('punkt')
 nltk.download('stopwords')
 english_stopwords = set(stopwords.words('english'))
@@ -55,7 +56,11 @@ class Preprocessing:
 
     def normalization(self, tweets):
         res = []
-        with open('./../static/slang-word.txt', 'r', encoding='utf-8') as file:
+        # Get the directory where your script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(script_dir, '..', 'static', 'slang-word.txt')
+
+        with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
             data = [line.strip().split('\t') for line in lines]
