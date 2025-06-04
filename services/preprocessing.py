@@ -55,7 +55,7 @@ class Preprocessing:
 
     def normalization(self, tweets):
         res = []
-        with open('../static/slang-word.txt', 'r', encoding='utf-8') as file:
+        with open('./../static/slang-word.txt', 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
             data = [line.strip().split('\t') for line in lines]
