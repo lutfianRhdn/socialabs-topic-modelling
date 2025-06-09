@@ -70,10 +70,14 @@ def topicModelling(dataGatheringQueue):
             dataForLda.append(tweet['full_text'])
 
         data = Preprocessing(dataForLda).get_data()
+        print("success prepos")
         lda = Lda()
         lda_model = lda.generateTopic(data)
+        print("success lda")
         topics = lda_model.show_topics(log=True, formatted=True)
+        print("success generate topics")
         documents_prob = lda.document(dataTweet, data, lda_model)
+        print("success generate documents")
 
         topic_res = []
         for topic_id, topic in topics:
@@ -86,13 +90,15 @@ def topicModelling(dataGatheringQueue):
                 "words": words
             }
             topic_res.append(topic_dict)
-
+        print("success group topics",topic_dict)
 
         documents_prob_id = [ doc['id_str'] for doc in documents_prob]
         project_documents = [ {**doc, "projectId": projectId} for doc in documents_prob]
-
+        print("unpack projects")
         Topics.createTopic(topic_res)
+        print("topic inserted")
         Topics.createDocument(project_documents)
+        print("document inserted")
 
         topicModellingProduce = {
             "projectId": projectId,
