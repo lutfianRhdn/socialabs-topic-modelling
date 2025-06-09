@@ -77,12 +77,12 @@ def topicModelling(dataGatheringQueue):
         topics = lda_model.show_topics(log=True, formatted=True)
         print("success generate topics")
         documents_prob = lda.document(dataTweet, data, lda_model)
-        print("success generate documents")
+        print("success generate documents",topic)
 
         topic_res = []
         for topic_id, topic in topics:
-            words = [word for word, _ in topic]
             print("keyword and topics",words,keyword)
+            words = [word for word, _ in topic]
             context = Llm.getContextByTopics(words, keyword)
             print(context)
             topic_dict = {
