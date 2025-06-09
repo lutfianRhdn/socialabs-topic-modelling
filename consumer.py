@@ -7,6 +7,9 @@ from services.lda import Lda
 from services.llm import Llm
 from models.tweet import Tweet
 from models.topics import Topics
+from concurrent.futures import ThreadPoolExecutor
+
+executor = ThreadPoolExecutor(max_workers=100)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,8 +27,9 @@ def consumer():
             def callback(ch, method, properties, body):
                 try:
                     tweet = json.loads(body.decode('utf-8'))
-                    print(tweet)
-                    topicModelling(tweet)
+                    executor.submit(topicModelling, tweet, ch, method)
+
+                    # topicModelling(tweet)
                     ch.basic_ack(delivery_tag=method.delivery_tag)
                 except json.JSONDecodeError as e:
                     logging.error(f"JSON decoding error: {e}")
@@ -34,7 +38,7 @@ def consumer():
                     logging.error(f"Error consuming message: {e}")
                     ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
-            channel.basic_qos(prefetch_count=1)
+            channel.basic_qos(prefetch_count=0)
             channel.basic_consume(queue="dataGatheringQueue", on_message_callback=callback, auto_ack=False)
 
             logging.info("Waiting for messages. To exit press CTRL+C")
