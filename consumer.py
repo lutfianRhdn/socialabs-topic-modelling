@@ -27,9 +27,7 @@ def consumer():
             def callback(ch, method, properties, body):
                 try:
                     tweet = json.loads(body.decode('utf-8'))
-                    # print("tweet",tweet)
-                    logging.info(tweet)
-                    executor.submit(topicModelling, tweet, ch, method)
+                    executor.submit(topicModelling, tweet)
 
                     # topicModelling(tweet)
                     ch.basic_ack(delivery_tag=method.delivery_tag)
