@@ -9,7 +9,7 @@ from models.tweet import Tweet
 from models.topics import Topics
 from concurrent.futures import ThreadPoolExecutor
 
-executor = ThreadPoolExecutor(max_workers=100)
+executor = ThreadPoolExecutor(max_workers=1000)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -51,6 +51,7 @@ def consumer():
 
 def topicModelling(dataGatheringQueue):
     try:
+        print('RECIVED MESSAGE for Project id : ',tweet['projectId'])
         tweetId = dataGatheringQueue['tweetId']
         projectId = dataGatheringQueue['projectId']
         keyword = dataGatheringQueue['keyword']
@@ -71,7 +72,7 @@ def topicModelling(dataGatheringQueue):
         data = Preprocessing(dataForLda).get_data()
         lda = Lda()
         lda_model = lda.generateTopic(data)
-        topics = lda_model.show_topics(log=False, formatted=False)
+        topics = lda_model.show_topics(log=True, formatted=True)
         documents_prob = lda.document(dataTweet, data, lda_model)
 
         topic_res = []
