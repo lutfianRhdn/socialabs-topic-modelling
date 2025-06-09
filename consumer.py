@@ -77,7 +77,7 @@ def topicModelling(dataGatheringQueue):
         topics = lda_model.show_topics(log=True, formatted=True)
         print("success generate topics")
         documents_prob = lda.document(dataTweet, data, lda_model)
-        print("success generate documents",topic)
+        print("success generate documents",topics)
 
         topic_res = []
         for topic_id, topic in topics:
