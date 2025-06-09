@@ -82,7 +82,9 @@ def topicModelling(dataGatheringQueue):
         topic_res = []
         for topic_id, topic in topics:
             words = [word for word, _ in topic]
+            print("keyword and topics",words,keyword)
             context = Llm.getContextByTopics(words, keyword)
+            print(context)
             topic_dict = {
                 "topicId": topic_id,
                 "projectId": dataGatheringQueue['projectId'],
