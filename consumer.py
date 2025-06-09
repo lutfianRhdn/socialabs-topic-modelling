@@ -51,7 +51,7 @@ def consumer():
 
 def topicModelling(dataGatheringQueue):
     try:
-        print('RECIVED MESSAGE for Project id : ',tweet['projectId'])
+        print('RECIVED MESSAGE for Project id : ',dataGatheringQueue['projectId'])
         tweetId = dataGatheringQueue['tweetId']
         projectId = dataGatheringQueue['projectId']
         keyword = dataGatheringQueue['keyword']
