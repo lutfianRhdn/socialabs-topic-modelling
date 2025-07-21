@@ -12,7 +12,7 @@ class TopicDocument:
 
 @strawberry.type
 @dataclass
-class TopicDocByProjectResponse:
+class TopicDocResponse:
     data: List[TopicDocument]
     message: str
     status: int
@@ -27,7 +27,7 @@ class TopicProject:
     words: List[str]
 
 @strawberry.type
-class TopicByProjectResponse:
+class TopicResponse:
     data: List[TopicProject]
     message: str
     status: int
