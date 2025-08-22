@@ -1,3 +1,4 @@
+import traceback
 import pika
 import json
 import logging
@@ -55,9 +56,11 @@ def topicModelling(dataGatheringQueue):
         tweetId = dataGatheringQueue['tweetId']
         projectId = dataGatheringQueue['projectId']
         keyword = dataGatheringQueue['keyword']
+        start_date = dataGatheringQueue['start_date']
+        end_date = dataGatheringQueue['end_date']
 
-        tweets_cursor = Tweet.getTweetByIdStr(tweetId)
-
+        tweets_cursor = Tweet.getTweetByIdStr(keyword, start_date, end_date)
+        print(" success get tweets by keyword with len : ", len(tweets_cursor))
         dataTweet = []
         dataForLda = []
 
@@ -76,41 +79,42 @@ def topicModelling(dataGatheringQueue):
         print("success lda",lda_model)
         topics = lda_model.show_topics(log=False, formatted=False)
         print("success generate topics",topics)
-        documents_prob = lda.document(dataTweet, data, lda_model)
-        print("success generate documents",documents_prob)
+        # documents_prob = lda.document(dataTweet, data, lda_model)
+        # # print("success generate documents",documents_prob)
 
-        topic_res = []
-        for topic_id, topic in topics:
-            words = [word for word, _ in topic]
-            print("keyword and topics",words,keyword)
-            context = Llm.getContextByTopics(words, keyword)
-            print(context)
-            topic_dict = {
-                "topicId": topic_id,
-                "projectId": dataGatheringQueue['projectId'],
-                "context": context,
-                "words": words
-            }
-            topic_res.append(topic_dict)
-        print("success group topics",topic_dict)
+        # topic_res = []
+        # for topic_id, topic in topics:
+        #     words = [word for word, _ in topic]
+        #     # print("keyword and topics",words,keyword)
+        #     context = Llm.getContextByTopics(words, keyword)
+        #     print(context)
+        #     topic_dict = {
+        #         "topicId": topic_id,
+        #         "projectId": dataGatheringQueue['projectId'],
+        #         "context": context,
+        #         "words": words
+        #     }
+        #     topic_res.append(topic_dict)
+        # print("success group topics",topic_dict)
+        # print('example documents_prob : ',documents_prob[0])
+        # documents_prob_id = [ str(doc['_id']) for doc in documents_prob]
+        # project_documents = [ {**doc, "projectId": projectId} for doc in documents_prob]
+        # print("unpack projects")
+        # Topics.createTopic(topic_res)
+        # print("topic inserted")
+        # Topics.createDocument(project_documents)
+        # print("document inserted")
 
-        documents_prob_id = [ doc['id_str'] for doc in documents_prob]
-        project_documents = [ {**doc, "projectId": projectId} for doc in documents_prob]
-        print("unpack projects")
-        Topics.createTopic(topic_res)
-        print("topic inserted")
-        Topics.createDocument(project_documents)
-        print("document inserted")
+        # topicModellingProduce = {
+        #     "projectId": projectId,
+        #     "tweetId": documents_prob_id,
+        # }
 
-        topicModellingProduce = {
-            "projectId": projectId,
-            "tweetId": documents_prob_id,
-        }
-
-        publish_message(topicModellingProduce)
-        produceProjectStatusQueue(projectId)
+        # publish_message(topicModellingProduce)
+        # produceProjectStatusQueue(projectId)
         
     except Exception as e:
+        traceback.print_exc()
         print(f"Error processing topic modeling: {e}")
 
 

@@ -8,7 +8,7 @@ def connect_to_database(url, database):
     return client, db
 
 # Connect to the first database
-client1, db1 = connect_to_database(db_url, 'topic_modelling')
+client1, db1 = connect_to_database(db_url, 'topic_modelling_old')
 
 # Connect to the second database
 client2, db2 = connect_to_database(db_url2, 'data_gathering')
