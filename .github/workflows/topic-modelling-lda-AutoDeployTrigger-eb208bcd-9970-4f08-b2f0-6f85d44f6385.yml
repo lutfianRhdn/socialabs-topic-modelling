@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout to the branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Azure Login
         uses: azure/login@v2
@@ -35,15 +35,12 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
-          registryUrl: 
+          dockerfilePath: Dockerfile
+          registryUrl: ${{ secrets.TOPICMODELLINGLDA_REGISTRY_URL }}
           registryUsername: ${{ secrets.TOPICMODELLINGLDA_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.TOPICMODELLINGLDA_REGISTRY_PASSWORD }}
           containerAppName: topic-modelling-lda
           resourceGroup: socialabs-services
-          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
+          imageToBuild: topic-modelling-lda:${{ github.sha }}
 
 
