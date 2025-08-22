@@ -28,15 +28,16 @@ COPY . .
 # Expose the port that the Flask application will run on
 EXPOSE 6000
 
-ENV APP_ENV=local
-ENV APP_DEBUG=True
-ENV APP_PORT=6000
-ENV DB_URL=mongodb+srv://application:CodeLabs011013@socialabs-database.global.mongocluster.cosmos.azure.com
-ENV DB_NAME=tweets
-ENV AZURE_OPENAI_KEY=4LpCIE7GP3QfCliKOSyLSu44HWGSJUeMAzcfSqgj8XS5EflenP1sJQQJ99AJACYeBjFXJ3w3AAAAACOG4ECn
-ENV AZURE_OPENAI_ENDPOINT=https://socialabs-llm.openai.azure.com/
-ENV AZURE_OPENAI_MODEL_NAME=socialabs-gpt-35
-ENV RABBITMQ_URL=amqp://application:CodeLabs011013@20.40.101.128:5672
+ENV APP_ENV="local"
+ENV APP_DEBUG="True"
+ENV APP_PORT="6000"
+ENV DB_URL_DATAGATHERING="mongodb+srv://application:skripsi@socialabs.pjkgs8t.mongodb.net/"
+ENV DB_URL="mongodb+srv://application:skripsi@socialabs.pjkgs8t.mongodb.net/"
+ENV DB_NAME="tweets"
+ENV AZURE_OPENAI_KEY="6YwpSUX7CKAhTAWRFieW7zj7Q3OoXJNtjGOCsvZsFnTN7g7MyX7SJQQJ99BGACYeBjFXJ3w3AAABACOGG9Qs"
+ENV AZURE_OPENAI_ENDPOINT="https://research-etm.openai.azure.com/"
+ENV AZURE_OPENAI_MODEL_NAME="gpt-35-turbo"
+ENV RABBITMQ_URL="amqp://socialabs:codelabs@57.155.68.154:5672/socialabs-old"
 
 # Copy the Gunicorn configuration file
 COPY gunicorn_config.py gunicorn_config.py
